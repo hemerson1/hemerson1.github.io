@@ -82,7 +82,21 @@ where $$h(t_0) = x$$ and $$h(t_1) = y$$. A solution to the above integral is the
 
 # 1.3 Back-propagation in a Continuous Depth Network 
 
-The most complex aspect of training a neural ODE is performing reverse-mode differentiation through the ODE solver. In this instance, the gradients of the ODE solver are computed using the **adjoint sensitivity method**, which 
+The most complex aspect of training a neural ODE is performing back-propagation (*reverse-mode automatic differentiation*) through the ODE solver. In this instance, the gradients are computed by solving an additional ODE backwards in time, in a method referred to as the [**adjoint sensitivity method**][AdjointMethod]. The loss of the model can be described by:
+
+$$
+\begin{equation}
+
+L(\boldsymbol{z}(t_1)) = 
+
+L\left( \boldsymbol{z}(t_0) + \int^{t_1}_{t_0} f(\boldsymbol{z}(t_1), t, \theta)dt \right) = ODESolve(\boldsymbol{z}(t_0), f, t_0, t_1, \theta), 
+
+
+\end{equation}
+$$
+
+where $$\boldsymbol{z}$$ is the hidden state. To optimise this loss, the gradient of the function must initially be computed with respect to the hidden state at each instance.
+
 
 ## Implementation
 
