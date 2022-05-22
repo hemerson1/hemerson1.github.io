@@ -36,7 +36,7 @@ $$
 \end{equation}
 $$
 
-In most instances, ODEs cannot be solved analytically and require numerical methods to find an approximate solution at discrete points. One of the simplest and most prominent examples of these methods is [Euler's method][EulerMethod]. This method is based on the idea that a curve can be approximated as a series of tangential line elements at fixed intervals, $$\delta$$:
+In most instances, ODEs cannot be solved analytically and require numerical methods to find an approximate solution at discrete points. One of the simplest and most prominent examples of these methods is [**Euler's method**][EulerMethod]. This method is based on the idea that a curve can be approximated as a series of tangential line elements at fixed intervals, $$\delta$$:
 
 $$ 
 \begin{equation}
@@ -82,7 +82,7 @@ where $$h(t_0) = x$$ and $$h(t_1) = y$$. A solution to the above integral is the
 
 # 1.3 Back-propagation in a Continuous Depth Network 
 
-The most complex aspect of training a neural ODE is performing reverse-mode differentiation through the ODE solver.
+The most complex aspect of training a neural ODE is performing reverse-mode differentiation through the ODE solver. In this instance, the gradients of the ODE solver are computed using the **adjoint sensitivity method**, which 
 
 ## Implementation
 
@@ -95,6 +95,8 @@ TODO:
 [NODEPaper]: https://arxiv.org/abs/1806.07366
 [NCDEPaper]: https://arxiv.org/abs/2005.08926
 [EulerMethod]: https://tutorial.math.lamar.edu/classes/de/eulersmethod.aspx
+[AdjointMethod]: https://towardsdatascience.com/the-story-of-adjoint-sensitivity-method-from-meteorology-906ab2796c73
+
 
 [NODEIntro]: https://jontysinai.github.io/jekyll/update/2019/01/18/understanding-neural-odes.html
 
