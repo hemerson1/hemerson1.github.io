@@ -9,6 +9,7 @@ categories: machine-learning
 TODO:
 - summarise the function of the network
 - explain in more detail why this method is worth knowing
+- label all the equations with numbers and refer to them in the text.
 
 ---------------------------------------------------------->
 
@@ -33,6 +34,9 @@ A typical *ordinary differential equation* (ODE) can be defined by the following
 $$ 
 \begin{equation}
 	\frac{dy}{dt} = f(t, y), \quad y(t_0) = y_0.
+	
+	\tag{1}\label{eq:one}	
+	
 \end{equation}
 $$
 
@@ -82,7 +86,7 @@ where $$h(t_0) = x$$ and $$h(t_1) = y$$. A solution to the above integral is the
 
 # 1.3 Back-propagation in a Continuous Depth Network 
 
-The most complex aspect of training a neural ODE is performing back-propagation (*reverse-mode automatic differentiation*) through the ODE solver. In this instance, the gradients are computed by solving an additional ODE backwards in time, in a method referred to as the [**adjoint sensitivity method**][AdjointMethod]. The loss of the model can be described by:
+The most complex aspect of training a neural ODE is performing back-propagation (or *reverse-mode automatic differentiation*) through the ODE solver. In this instance, the gradients are computed by solving an additional ODE backwards in time, in a method referred to as the [**adjoint sensitivity method**][AdjointMethod]. The loss of the model can be described by:
 
 $$
 \begin{equation}
@@ -95,10 +99,67 @@ L\left( \boldsymbol{z}(t_0) + \int^{t_1}_{t_0} f(\boldsymbol{z}(t_1), t, \theta)
 \end{equation}
 $$
 
-where $$\boldsymbol{z}$$ is the hidden state. To optimise this loss, the gradient of the function must initially be computed with respect to the hidden state at each instance.
+where $$\boldsymbol{z}$$ is the hidden state. To optimise this loss, the gradient of the function must initially be computed with respect to the hidden state at each instance. This quantity defines the **adjoint state** and is given by:
+
+$$
+\begin{equation}
+
+\boldsymbol{a}(t) = \frac{dL}{d\boldsymbol{z}(t)}.
+
+\end{equation}
+$$
+
+The dynamics of the adjoint state can be determined by considering a transformation of the hidden state under a change in time, $$\epsilon$$.
+
+$$
+\begin{equation}
+
+z(t + \epsilon) = \int^{t + \epsilon}_t f(\boldsymbol{z}(t), t, \theta) + \boldsymbol{z}(t) = T_{\epsilon}(\boldsymbol{z}(t), t), 
+
+\end{equation}
+$$
+
+where $$\frac{d\boldsymbol{z}(t)}{dt} = f(\boldsymbol{z}(t), t, \theta)$$. By using the chain rule and the above equation the adjoint state can be redefined as:
+
+$$
+\begin{equation}
+  \boldsymbol{a}(t) = \frac{dL}{d\boldsymbol{z}(t)} 
+                    
+                    = \frac{dL}{d\boldsymbol{z}(t + \epsilon)} \frac{d\boldsymbol{z}(t + \epsilon)}{d\boldsymbol{z}(t)} 
+                    
+                    = \boldsymbol{a}(t + \epsilon) \frac{\partial T_\epsilon(\boldsymbol{z}(t), t,)}{\partial \boldsymbol{z}(t)}.
+  
+\end{equation}
+$$
+
+The derivative of the adjoint state then follows from the above equation:
+
+$$
+\begin{align*}
+  
+  \frac{d\boldsymbol{a}(t)}{dt} &= \lim_{\epsilon \to 0^+} \frac{\boldsymbol{a}(t + \epsilon) - \boldsymbol{a}(t)}{\epsilon} \\  
+  
+  &= \lim_{\epsilon \to 0^+} \frac{\boldsymbol{a}(t + \epsilon) - \boldsymbol{a}(t + \epsilon) \frac{\partial}{\partial \boldsymbol{z}(t)} T_\epsilon(\boldsymbol{z}(t))}{\epsilon} && \text{(from the above equation)} \\ 
+    
+  &= \lim_{\epsilon \to 0^+} \frac{\boldsymbol{a}(t + \epsilon) - \boldsymbol{a}(t + \epsilon) \frac{\partial}{\partial \boldsymbol{z}(t)} \left( \boldsymbol{z}(t) + \epsilon f(\boldsymbol{z}(t), t, \theta) + \mathcal{O}(\epsilon^2) \right)}{\epsilon} && \text{(Taylor series expansion)} \\
+  
+  &= - \boldsymbol{a}(t) \frac{\partial f(\boldsymbol{z}(t), t, \theta)}{\partial \boldsymbol{z}(t)} && \text{(Rearranging and taking the limit)}
+  
+\end{align*}
+$$
+
+For a solution to the adjoint state to be obtained at any time, the above ODE needs to be solved backwards in time with respect to the last time point.
+
+$$
+\begin{equation}
+
+\boldsymbol{a}(t_0) = \frac{dL}{d\boldsymbol{z}(t_N)} - \int^{t_0}_{t_1} \boldsymbol{a}(t)^T \frac{\partial f(\boldsymbol{z}(t), t, \theta)}{\partial \boldsymbol{z}(t)}
+
+\end{equation}
+$$
 
 
-## Implementation
+## 2. Implementation
 
 <!-----------------------------------------------------------
 TODO:
