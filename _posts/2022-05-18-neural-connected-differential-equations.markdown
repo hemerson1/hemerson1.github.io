@@ -10,6 +10,8 @@ TODO:
 - summarise the function of the network
 - explain in more detail why this method is worth knowing
 - label all the equations with numbers and refer to them in the text.
+- add greater spacing between subsections
+- add some images to help illustrate the points.
 
 ---------------------------------------------------------->
 
@@ -148,7 +150,7 @@ $$
 \end{align*}
 $$
 
-For a solution to the adjoint state to be obtained at any time, the above ODE needs to be solved backwards in time with respect to the last time point.
+To obtain a solution to the adjoint state for a given time, the above ODE needs to be solved backwards in time with respect to the last time point.
 
 $$
 \begin{equation}
@@ -158,6 +160,90 @@ $$
 \end{equation}
 $$
 
+The above equation can be generalised to determine the derivate of the loss with respect to $$\theta$$ by defining $$\theta$$ and $$t$$ as states with constant differential equations:
+
+$$
+\begin{equation}
+
+\frac{\partial \theta (t)}{\partial t} = \boldsymbol{0} \qquad \frac{dt(t)}{dt} = 1.
+
+\end{equation}
+$$
+
+These differential equations can be combined with $$z$$ to create an augmented state: 
+
+$$
+\begin{equation}
+
+\frac{d}{dt} \begin{bmatrix} \boldsymbol{z} \\ \boldsymbol{0} \\ 1 \end{bmatrix} (t) = f_{aug}([\boldsymbol{z}, \theta, t]) := \begin{bmatrix} f([z, \theta, t]) \\ \boldsymbol{0} \\ 1 \end{bmatrix},  
+
+\boldsymbol{a}_{aug} := \begin{bmatrix} \boldsymbol{a} \\ \boldsymbol{a}_\theta \\ \boldsymbol{a}_t \end{bmatrix}, 
+
+\boldsymbol{a}_\theta := \frac{dL}{d\theta(t)}, 
+
+\boldsymbol{a}_t := \frac{dL}{dt(t)}.
+
+\end{equation}
+$$
+
+From the above definition it is clear that the Jacobian of the augmented state is defined as:
+
+$$
+\begin{equation}
+
+\frac{df_{aug}}{d[\boldsymbol{z}, \theta, t]} = 
+
+\begin{bmatrix} 
+\frac{\partial f}{\partial \boldsymbol{z}} & \frac{\partial f}{\partial \theta} & \frac{\partial f}{\partial t} \\
+\boldsymbol{0} & \boldsymbol{0} & \boldsymbol{0} \\
+\boldsymbol{0} & \boldsymbol{0} & \boldsymbol{0} \\
+
+\end{bmatrix}
+
+\end{equation}
+$$
+
+The Jacobian can then be combined with the above equation to yield:
+
+
+$$
+\begin{equation}
+
+\frac{d \boldsymbol{a}_{aug}(t)}{dt} = 
+
+-\begin{bmatrix} 
+\boldsymbol{a}\frac{\partial f}{\partial \boldsymbol{z}} &
+
+\boldsymbol{a}\frac{\partial f}{\partial \theta} &
+
+\boldsymbol{a}\frac{\partial f}{\partial t} 
+\end{bmatrix}
+
+\end{equation}
+$$
+
+Taking the second term of this equation and defining $$\boldsymbol{a}_\theta = \boldsymbol{0}$$ yields the expression:
+
+
+$$
+\begin{equation}
+
+\frac{dL}{d\theta} = - \int^{t_0}_{t_N} \boldsymbol{a}(t) \frac{\partial f(\boldsymbol{z}(t), t, \theta)}{\partial \theta} dt
+
+\end{equation}
+$$
+
+The final component of the above equation can then be used to determine the gradients of the remaining free parameters $$t_0$$ and $$t_N$$:
+
+$$
+\begin{equation}
+
+\frac{dL}{dt_N} = \boldsymbol{a}(t_N) f(\boldsymbol{z}(t_N), t_N, \theta), \quad
+
+\frac{dL}{dt_0} = \boldsymbol{a}(t_N) - \int^{t_0}_{t_N} \boldsymbol{a}(t) \frac{\partial f(\boldsymbol{z}(t), t, \theta)}{\partial t} dt.
+
+\end{equation}
+$$
 
 ## 2. Implementation
 
