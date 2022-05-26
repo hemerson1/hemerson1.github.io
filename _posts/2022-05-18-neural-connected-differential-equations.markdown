@@ -12,6 +12,7 @@ TODO:
 - label all the equations with numbers and refer to them in the text.
 - add greater spacing between subsections
 - add some images to help illustrate the points.
+- condense the automatic differentiation section.
 
 ---------------------------------------------------------->
 
@@ -25,7 +26,7 @@ TODO:
 - introduce ODEs -> DONE
 - may want to discuss why solve for dy/dx and not y? 
 - explain similarity Euler's equation and NN hidden structure -> DONE
-- explain Reverse-mode automatic differentiation
+- explain Reverse-mode automatic differentiation - > DONE 
 
 ------------------------------------------------------------->
 
@@ -165,7 +166,7 @@ The above equation can be generalised to determine the derivate of the loss with
 $$
 \begin{equation}
 
-\frac{\partial \theta (t)}{\partial t} = \boldsymbol{0} \qquad \frac{dt(t)}{dt} = 1.
+\frac{\partial \theta (t)}{\partial t} = \boldsymbol{0}, \qquad \frac{dt(t)}{dt} = 1.
 
 \end{equation}
 $$
@@ -245,6 +246,37 @@ $$
 \end{equation}
 $$
 
+The complete algorithm for computing the reverse-mode derivate is then given as follows:
+
+<pre id="quicksort" class="pseudocode" style="display:none;">
+    % This quicksort algorithm is extracted from Chapter 7, Introduction to Algorithms (3rd edition)
+    \begin{algorithm}
+    \caption{Quicksort}
+    \begin{algorithmic}
+    \PROCEDURE{Quicksort}{$A, p, r$}
+        \IF{$p < r$} 
+            \STATE $q = $ \CALL{Partition}{$A, p, r$}
+            \STATE \CALL{Quicksort}{$A, p, q - 1$}
+            \STATE \CALL{Quicksort}{$A, q + 1, r$}
+        \ENDIF
+    \ENDPROCEDURE
+    \PROCEDURE{Partition}{$A, p, r$}
+        \STATE $x = A[r]$
+        \STATE $i = p - 1$
+        \FOR{$j = p$ \TO $r - 1$}
+            \IF{$A[j] < x$}
+                \STATE $i = i + 1$
+                \STATE exchange
+                $A[i]$ with $A[j]$
+            \ENDIF
+            \STATE exchange $A[i]$ with $A[r]$
+        \ENDFOR
+    \ENDPROCEDURE
+    \end{algorithmic}
+    \end{algorithm}
+</pre>
+
+
 ## 2. Implementation
 
 <!-----------------------------------------------------------
@@ -261,5 +293,16 @@ TODO:
 
 [NODEIntro]: https://jontysinai.github.io/jekyll/update/2019/01/18/understanding-neural-odes.html
 
-
-
+<!---
+Renderers for the algorithms on the page.
+-->
+<script>
+    pseudocode.renderElement(
+    
+    document.getElementById("quicksort"), {
+    		lineNumber: false, 
+    		noEnd: true
+    }
+    
+    );
+</script>
