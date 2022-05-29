@@ -248,32 +248,34 @@ $$
 
 The complete algorithm for computing the reverse-mode derivate is then given as follows:
 
-<pre id="quicksort" class="pseudocode" style="display:none;">
-    % This quicksort algorithm is extracted from Chapter 7, Introduction to Algorithms (3rd edition)
+<pre id="reverse-mode-diff" class="pseudocode" style="display:none;">
+
     \begin{algorithm}
-    \caption{Quicksort}
+    \caption{Reverse-mode derivative of ODE initial value problem.}
     \begin{algorithmic}
-    \PROCEDURE{Quicksort}{$A, p, r$}
-        \IF{$p < r$} 
-            \STATE $q = $ \CALL{Partition}{$A, p, r$}
-            \STATE \CALL{Quicksort}{$A, p, q - 1$}
-            \STATE \CALL{Quicksort}{$A, q + 1, r$}
-        \ENDIF
-    \ENDPROCEDURE
-    \PROCEDURE{Partition}{$A, p, r$}
-        \STATE $x = A[r]$
-        \STATE $i = p - 1$
-        \FOR{$j = p$ \TO $r - 1$}
-            \IF{$A[j] < x$}
-                \STATE $i = i + 1$
-                \STATE exchange
-                $A[i]$ with $A[j]$
-            \ENDIF
-            \STATE exchange $A[i]$ with $A[r]$
-        \ENDFOR
-    \ENDPROCEDURE
+    
+    \INPUT{dynamics parameters $ \theta $, start time $ t_0 $, stop time $ t_1 $, final state $ \boldsymbol{z}(t_1)$, loss gradient $ \frac{\partial L}{\partial \boldsymbol{z}(t_1)} $} 
+    
+    \STATE $\frac{\partial L}{\partial t_1} = \frac{\partial L}{\partial \boldsymbol{z}(t_1)}^\intercal f(\boldsymbol{z}(t_1), t_1, \theta)$ 	
+    
+    \COMMENT{Compute gradient w.r.t $t_1$.}
+    
+    \STATE $s_0 = [\boldsymbol{z}(t_1), \frac{\partial L}{\partial \boldsymbol{z}(t_1)}, \boldsymbol{0}_{|\theta|}, -\frac{\partial L}{\partial t_1}]$ \COMMENT{Define initial augmented state.}
+    
+    
+    \PROCEDURE{augDynamics}{$[\boldsymbol{z}(t), \boldsymbol{a}(t), ...], t, \theta$}
+    \IF{$p < r$} 
+        \STATE $q = $ \CALL{Partition}{$A, p, r$}
+        \STATE \CALL{Quicksort}{$A, p, q - 1$}
+        \STATE \CALL{Quicksort}{$A, q + 1, r$}
+    \ENDIF
+	\ENDPROCEDURE
+    
+    
+    
     \end{algorithmic}
     \end{algorithm}
+    
 </pre>
 
 
@@ -293,13 +295,13 @@ TODO:
 
 [NODEIntro]: https://jontysinai.github.io/jekyll/update/2019/01/18/understanding-neural-odes.html
 
-<!---
+<!--------------------------------------------
 Renderers for the algorithms on the page.
--->
+---------------------------------------------->
 <script>
     pseudocode.renderElement(
     
-    document.getElementById("quicksort"), {
+    document.getElementById("reverse-mode-diff"), {
     		lineNumber: false, 
     		noEnd: true
     }
