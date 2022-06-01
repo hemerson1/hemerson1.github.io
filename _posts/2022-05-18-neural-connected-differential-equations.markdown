@@ -16,7 +16,13 @@ TODO:
 
 ---------------------------------------------------------->
 
-**Neural ordinary differential equations** are a powerful tool for continuous time-series modelling. They hold strong advantages over more traditional methods of forecasting, such as recurrent neural networks, as they can be trained on samples of irregularly-spaced data and are robust to missing values. 
+**Neural ordinary differential equations** are a powerful tool for continuous time-series modelling. These functional approximators generalise the discrete layer propagation of traditional models by parametrising the derivative of the hidden state using an ordinary differential equation specified by a neural network. The evolution of the hidden state can then be modelled by integrating the network output over a specified time interval. This approach holds strong advantages over models using discrete hidden layers, such as recurrent and residual neural networks. Most notably they can:
+
+- utilise irregularly spaced time series data
+- make predictions in the presence of missing values
+- be trained with constant memory cost as a function of depth
+
+This article will describe the underlying of neural ordinary differential equations. This includes an in depth breakdown of the underlying mathematics and a from scratch implementation of the method in python. 
 
 
 ## 1. Mathematics
@@ -256,22 +262,20 @@ The complete algorithm for computing the reverse-mode derivate is then given as 
     
     \INPUT{dynamics parameters $ \theta $, start time $ t_0 $, stop time $ t_1 $, final state $ \boldsymbol{z}(t_1)$, loss gradient $ \frac{\partial L}{\partial \boldsymbol{z}(t_1)} $} 
     
-    \STATE $\frac{\partial L}{\partial t_1} = \frac{\partial L}{\partial \boldsymbol{z}(t_1)}^\intercal f(\boldsymbol{z}(t_1), t_1, \theta)$ 	
+    \STATE $\frac{\partial L}{\partial t_1} = \frac{\partial L}{\partial \boldsymbol{z}(t_1)}^\intercal f(\boldsymbol{z}(t_1), t_1, \theta)$ \COMMENT{Compute gradient w.r.t $t_1$}
     
-    \COMMENT{Compute gradient w.r.t $t_1$.}
-    
-    \STATE $s_0 = [\boldsymbol{z}(t_1), \frac{\partial L}{\partial \boldsymbol{z}(t_1)}, \boldsymbol{0}_{|\theta|}, -\frac{\partial L}{\partial t_1}]$ \COMMENT{Define initial augmented state.}
+    \STATE $s_0 = [\boldsymbol{z}(t_1), \frac{\partial L}{\partial \boldsymbol{z}(t_1)}, \boldsymbol{0}_{|\theta|}, -\frac{\partial L}{\partial t_1}]$ \COMMENT{Define initial augmented state}
     
     
-    \PROCEDURE{augDynamics}{$[\boldsymbol{z}(t), \boldsymbol{a}(t), ...], t, \theta$}
-    \IF{$p < r$} 
-        \STATE $q = $ \CALL{Partition}{$A, p, r$}
-        \STATE \CALL{Quicksort}{$A, p, q - 1$}
-        \STATE \CALL{Quicksort}{$A, q + 1, r$}
-    \ENDIF
-	\ENDPROCEDURE
+    \FUNCTION{AugDynamics}{$[\boldsymbol{z}(t), \boldsymbol{a}(t), ...], t, \theta$} \COMMENT{Define dynamics on augmented state}
     
+    \RETURN $[f(\boldsymbol{z}(t), t, \theta), -\boldsymbol{a}(t)^T \frac{\partial f}{\partial \boldsymbol{z}}, -\boldsymbol{a}(t)^T \frac{\partial f}{\partial t}]$ \COMMENT{Compute vector-Jacobian products}
     
+	\ENDFUNCTION
+    
+    \STATE $[\boldsymbol{z}(t_0), \frac{\partial L}{\partial \boldsymbol{z}(t_0)}, \frac{\partial L}{\partial \theta}, \frac{\partial L}{\partial t_0}] = $ \CALL{ODESolve}{$s_0, $\CALL{AugDynamics}{}$, t_1, t_0, \theta$} \COMMENT{Solve reverse-time ODE}
+    
+    \RETURN $\frac{\partial L}{\partial \boldsymbol{z}(t_0)}, \frac{\partial L}{\partial \theta}, \frac{\partial L}{\partial t_0}, \frac{\partial L}{\partial t_1}$ \COMMENT{Return all gradients}
     
     \end{algorithmic}
     \end{algorithm}
@@ -292,6 +296,8 @@ TODO:
 [EulerMethod]: https://tutorial.math.lamar.edu/classes/de/eulersmethod.aspx
 [AdjointMethod]: https://towardsdatascience.com/the-story-of-adjoint-sensitivity-method-from-meteorology-906ab2796c73
 
+[NODECode]: http://implicit-layers-tutorial.org/neural_odes/
+
 
 [NODEIntro]: https://jontysinai.github.io/jekyll/update/2019/01/18/understanding-neural-odes.html
 
@@ -299,12 +305,5 @@ TODO:
 Renderers for the algorithms on the page.
 ---------------------------------------------->
 <script>
-    pseudocode.renderElement(
-    
-    document.getElementById("reverse-mode-diff"), {
-    		lineNumber: false, 
-    		noEnd: true
-    }
-    
-    );
+    pseudocode.renderElement( document.getElementById("reverse-mode-diff"));
 </script>
