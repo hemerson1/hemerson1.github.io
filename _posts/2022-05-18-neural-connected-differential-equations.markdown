@@ -7,8 +7,8 @@ categories: machine-learning
 
 <!--------------------------------------------------------
 TODO:
-- summarise the function of the network
-- explain in more detail why this method is worth knowing
+- summarise the function of the network -> DONE
+- explain in more detail why this method is worth knowing -> DONE
 - label all the equations with numbers and refer to them in the text.
 - add greater spacing between subsections
 - add some images to help illustrate the points.
@@ -22,7 +22,7 @@ TODO:
 - make predictions in the presence of missing values
 - be trained with constant memory cost as a function of depth
 
-This article will describe the underlying of neural ordinary differential equations. This includes an in depth breakdown of the underlying mathematics and a from scratch implementation of the method in python. 
+This article will describe the underlying theory of neural ordinary differential equations. This includes an in-depth explanation of the mathematics required to understand the approach and a minimal implementation of the method in python. 
 
 
 ## 1. Mathematics
@@ -30,7 +30,6 @@ This article will describe the underlying of neural ordinary differential equati
 <!-----------------------------------------------------------
 TODO:
 - introduce ODEs -> DONE
-- may want to discuss why solve for dy/dx and not y? 
 - explain similarity Euler's equation and NN hidden structure -> DONE
 - explain Reverse-mode automatic differentiation - > DONE 
 
@@ -38,7 +37,7 @@ TODO:
 
 # 1.1 Ordinary Differential Equations
 
-A typical *ordinary differential equation* (ODE) can be defined by the following equation:
+To understand neural ordinary differential equations it is necessary to have a foundational knowledge of *ordinary differential equations* (ODE). An ODE is a differential equation which contains one or more functions of a single independent variable and can be specified by the following:
 
 $$ 
 \begin{equation}
@@ -49,7 +48,7 @@ $$
 \end{equation}
 $$
 
-In most instances, ODEs cannot be solved analytically and require numerical methods to find an approximate solution at discrete points. One of the simplest and most prominent examples of these methods is [**Euler's method**][EulerMethod]. This method is based on the idea that a curve can be approximated as a series of tangential line elements at fixed intervals, $$\delta$$:
+In most instances, ODEs cannot be solved analytically and require numerical methods to find approximate solutions at discrete points. One of the simplest and most prominent examples is [**Euler's method**][EulerMethod]. This method is based on the idea that a curve can be approximated as a series of tangential line elements at a fixed interval, $$\delta$$:
 
 $$ 
 \begin{equation}
@@ -57,13 +56,16 @@ $$
 \end{equation}
 $$
 
-The above expression can be rearranged to the following form to allow the explicit approximation of $$y$$ at future timesteps:
+By rearranging the above expression, an explicit approximation of $$y$$ at future timesteps can be obtained:
 
 $$ 
 \begin{equation}
 	y_{n+1} = y_n + \delta f(t_n, y_n), \quad n = 0, 1, 2, ...
 \end{equation}
 $$
+
+By recursively computing $y_{n+1}$ from some initial set of values, $(t_0, y_0)$ the above equation can be used to model the evolution of $y$ over long prediction horizons. To optimise the parameters of the ODE, the loss is calculated at a series of evaluation points and its derivative is backpropagated through the model to improve accuracy. This update approach is typically more computationally efficient than stochastic gradient descent as the derivative of the loss need only be computed at the pre-specified evaluation points. 
+
 
 # 1.2 Neural Ordinary Differential Equations
 
