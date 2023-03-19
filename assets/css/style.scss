@@ -1,0 +1,21 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+
+@import
+  "minima/skins/{{ site.minima.skin | default: 'classic' }}",
+  "minima/initialize";
+  
+  
+ .centre-image
+{
+    margin: 0 auto;
+    display: block;
+    padding: 20px;
+}
+
+.fig-caption
+{
+    text-align: center;
+    margin-bottom: 25px;
+}
