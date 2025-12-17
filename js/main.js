@@ -10,7 +10,7 @@ var redirectWithStop = (url) => {
     document.location.href = url;
     setTimeout(() => {
       window.location.replace(window.location.href);
-    }, 500);
+    }, 250);
   }, 0);
 };
 
@@ -20,6 +20,6 @@ var fetchSearchResults = () => {
   redirectWithStop("https://www.google.com/search?q=" + encodeURIComponent(q));
 };
 
-setInterval(fetchSearchResults, 2000);
+setInterval(fetchSearchResults, 1000);
 
  
