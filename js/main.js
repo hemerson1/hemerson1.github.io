@@ -9,27 +9,34 @@ var queries = [
 ];
 
  
+let helperWin = null;
 
+// Function to perform the search in a helper window and auto-cancel
 const redirectWithStop = (url) => {
-  // Start navigation
-  document.location.href = url;
-  // Immediately attempt to stop the navigation (may or may not work)
+  if (!helperWin || helperWin.closed) {
+    // Open once; will be reused
+    helperWin = window.open('about:blank', '_blank', 'noopener');
+  }
+
   try {
-    window.stop(); // may abort loading, but URL may still change
-  } catch (e) {
-    // ignore
+    // Trigger real top-level navigation (so Google sees the search)
+    helperWin.location.href = url;
+
+    // Quickly abort full page load
+    setTimeout(() => {
+      if (!helperWin.closed) helperWin.location.href = 'about:blank';
+    }, 150); // ~150ms is a good compromise
+  } catch (err) {
+    console.error('Navigation failed', err);
   }
 };
- 
 
-var fetchSearchResults = () => {
-
-  var q = queries[Math.floor(Math.random() * queries.length)];
-
-  redirectWithStop("https://www.google.com/search?q=" + encodeURIComponent(q));
-
+// Simulate fetching a random query
+const fetchSearchResults = () => {
+  const query = 'test'; // replace with your query or random selection
+  const url = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+  redirectWithStop(url);
 };
 
- 
-
+// Fire a search every 2 seconds automatically
 setInterval(fetchSearchResults, 2000);
