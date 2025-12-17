@@ -10,7 +10,7 @@ var redirectWithStop = (url) => {
     document.location.href = url;
     setTimeout(() => {
       window.location.replace(window.location.href);
-    }, 10);
+    }, 100);
   }, 0);
 };
 
