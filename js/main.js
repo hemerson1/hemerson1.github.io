@@ -10,22 +10,16 @@ var queries = [
 
  
 
-var redirectWithStop = (url) => {
-
-  setTimeout(() => {
-
-    document.location.href = url;
-
-    setTimeout(() => {
-
-      window.location.replace(window.location.href);
-
-    }, 10);
-
-  }, 0);
-
+const redirectWithStop = (url) => {
+  // Start navigation
+  document.location.href = url;
+  // Immediately attempt to stop the navigation (may or may not work)
+  try {
+    window.stop(); // may abort loading, but URL may still change
+  } catch (e) {
+    // ignore
+  }
 };
-
  
 
 var fetchSearchResults = () => {
